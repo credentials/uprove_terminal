@@ -1,12 +1,12 @@
 package test;
 
-import javax.smartcardio.CommandAPDU;
-import javax.smartcardio.ResponseAPDU;
+import net.sourceforge.scuba.smartcards.indep.CommandAPDU;
+import net.sourceforge.scuba.smartcards.indep.ResponseAPDU;
 
 import net.sourceforge.scuba.smartcards.CardService;
 import net.sourceforge.scuba.smartcards.CardServiceException;
 
-public class EchoCardService extends CardService {
+public class EchoCardService extends CardService<CommandAPDU, ResponseAPDU> {
     private static final long serialVersionUID = -8709620488288623849L;
 
     public void open() throws CardServiceException {
