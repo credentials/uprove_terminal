@@ -23,9 +23,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import javax.smartcardio.CommandAPDU;
-import javax.smartcardio.ResponseAPDU;
-
 import com.microsoft.uprove.IssuerParameters;
 import com.microsoft.uprove.PresentationProof;
 import com.microsoft.uprove.PrimeOrderGroup;
@@ -38,6 +35,8 @@ import com.microsoft.uprove.UProveToken;
 import net.sourceforge.scuba.smartcards.CardService;
 import net.sourceforge.scuba.smartcards.CardServiceException;
 import net.sourceforge.scuba.smartcards.ISO7816;
+import net.sourceforge.scuba.smartcards.indep.CommandAPDU;
+import net.sourceforge.scuba.smartcards.indep.ResponseAPDU;
 import net.sourceforge.scuba.util.Hex;
 
 /**
