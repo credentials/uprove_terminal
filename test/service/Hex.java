@@ -1,4 +1,4 @@
-package test;
+package service;
 
 /**
  * Some static helper methods for dealing with hexadecimal notation.

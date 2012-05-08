@@ -1,4 +1,4 @@
-package test;
+package service;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -9,8 +9,6 @@ import javax.smartcardio.CardTerminals;
 import javax.smartcardio.TerminalFactory;
 
 import net.sourceforge.scuba.smartcards.TerminalCardService;
-
-import service.UProveService;
 
 import com.microsoft.uprove.InvalidProofException;
 import com.microsoft.uprove.Issuer;

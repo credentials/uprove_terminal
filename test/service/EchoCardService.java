@@ -1,12 +1,13 @@
-package test;
+package service;
 
-import net.sourceforge.scuba.smartcards.indep.CommandAPDU;
-import net.sourceforge.scuba.smartcards.indep.ResponseAPDU;
 
 import net.sourceforge.scuba.smartcards.CardService;
 import net.sourceforge.scuba.smartcards.CardServiceException;
+import net.sourceforge.scuba.smartcards.ICommandAPDU;
+import net.sourceforge.scuba.smartcards.IResponseAPDU;
+import net.sourceforge.scuba.smartcards.ResponseAPDU;
 
-public class EchoCardService extends CardService<CommandAPDU, ResponseAPDU> {
+public class EchoCardService extends CardService {
     private static final long serialVersionUID = -8709620488288623849L;
 
     public void open() throws CardServiceException {
@@ -18,14 +19,12 @@ public class EchoCardService extends CardService<CommandAPDU, ResponseAPDU> {
         return true;
     }
 
-    @Override
-    public ResponseAPDU transmit(CommandAPDU apdu) throws CardServiceException {
+    public IResponseAPDU transmit(ICommandAPDU apdu) throws CardServiceException {
         System.out.println("transmit(CommandAPDU) called");
         System.out.println(Hex.bytesToHexString(apdu.getBytes()));
         return new ResponseAPDU(new byte[]{(byte) 0x90, 0x00});
     }
 
-    @Override
     public void close() {
         System.out.println("close() called");
     }

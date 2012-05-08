@@ -1,4 +1,4 @@
-package test;
+package service;
 
 /**
  * U-Prove test vectors as specified in the U-Prove Cryptographic Specification,
