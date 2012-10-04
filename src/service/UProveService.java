@@ -35,8 +35,7 @@ import com.microsoft.uprove.UProveToken;
 import net.sourceforge.scuba.smartcards.CardService;
 import net.sourceforge.scuba.smartcards.CardServiceException;
 import net.sourceforge.scuba.smartcards.CommandAPDU;
-import net.sourceforge.scuba.smartcards.ICommandAPDU;
-import net.sourceforge.scuba.smartcards.IResponseAPDU;
+import net.sourceforge.scuba.smartcards.ResponseAPDU;
 import net.sourceforge.scuba.smartcards.ISO7816;
 import net.sourceforge.scuba.util.Hex;
 
@@ -262,10 +261,10 @@ public class UProveService extends CardService implements Prover {
      * @param <c>
      * 
      * @param apdu the APDU to be send to the smart card.
-     * @return IResponseAPDU the response from the smart card.
+     * @return ResponseAPDU the response from the smart card.
      * @throws CardServiceException if some error occurred while transmitting.
      */
-    public IResponseAPDU transmit(ICommandAPDU capdu) 
+    public ResponseAPDU transmit(CommandAPDU capdu) 
     throws CardServiceException { 
 
         if (VERBOSE) {
@@ -274,7 +273,7 @@ public class UProveService extends CardService implements Prover {
         }
 
         long start = System.nanoTime();
-        IResponseAPDU rapdu = service.transmit(capdu);
+        ResponseAPDU rapdu = service.transmit(capdu);
         long duration = (System.nanoTime() - start)/1000000;
 
         if (VERBOSE) {
@@ -301,9 +300,9 @@ public class UProveService extends CardService implements Prover {
      */
     public void selectApplet() 
     throws CardServiceException {
-        ICommandAPDU select = new CommandAPDU(ISO7816.CLA_ISO7816,  
+        CommandAPDU select = new CommandAPDU(ISO7816.CLA_ISO7816,  
                 INS_SELECT, 0x04, 0x00, AID, 256); // LE == 0 is required.
-        IResponseAPDU response = transmit(select);
+        ResponseAPDU response = transmit(select);
         if (response.getSW() != 0x00009000) {
             throw new CardServiceException("Could not select the U-Prove " +
                     "applet.", response.getSW());
@@ -319,9 +318,9 @@ public class UProveService extends CardService implements Prover {
      */
     public void testMode(byte mode)
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_TESTMODE, mode, 0x00);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             throw new CardServiceException("Could not set test mode.", 
                     response.getSW());
@@ -473,10 +472,10 @@ public class UProveService extends CardService implements Prover {
      */
     void setNumberOfTokens(int numberOfTokens) 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_SET_NUMBER_OF_TOKENS, 0x00, 0x00, 
                 new byte[] {(byte)numberOfTokens});
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not set number of tokens.");
@@ -495,9 +494,9 @@ public class UProveService extends CardService implements Prover {
      */
     int getNumberOfTokens() 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_NUMBER_OF_TOKENS, 0x00, 0x00);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not get number of tokens.");
@@ -607,9 +606,9 @@ public class UProveService extends CardService implements Prover {
      */
     void setParametersUID(byte[] parametersUID) 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_SET_PARAMETERS_UID, 0x00, 0x00, parametersUID);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not set parameters UID.");
@@ -632,9 +631,9 @@ public class UProveService extends CardService implements Prover {
      */
     byte[] getParametersUID() 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_PARAMETERS_UID, 0x00, 0x00);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not get parameters UID.");
@@ -665,9 +664,9 @@ public class UProveService extends CardService implements Prover {
 
             // p (P1 == 0x00)
             byte[] p = BigIntegerToUnsignedByteArray(subgroup.getP());
-            ICommandAPDU command_p = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command_p = new CommandAPDU(CLA_UPROVE, 
                     INS_SET_GROUP, P1_GROUP_P, 0x00, fixLength(p));
-            IResponseAPDU response_p = transmit(command_p);
+            ResponseAPDU response_p = transmit(command_p);
             if (response_p.getSW() != 0x00009000) {
                 if (response_p.getSW() == 0x00006D00) {
                     notSupported("Could not set group prime p.");
@@ -679,9 +678,9 @@ public class UProveService extends CardService implements Prover {
 
             // q (P1 == 0x01)
             byte[] q = BigIntegerToUnsignedByteArray(subgroup.getQ());
-            ICommandAPDU command_q = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command_q = new CommandAPDU(CLA_UPROVE, 
                     INS_SET_GROUP, P1_GROUP_Q, 0x00, fixLength(q)); 
-            IResponseAPDU response_q = transmit(command_q);
+            ResponseAPDU response_q = transmit(command_q);
             if (response_q.getSW() != 0x00009000) {
                 if (response_q.getSW() == 0x00006D00) {
                     notSupported("Could not set group order q.");
@@ -693,9 +692,9 @@ public class UProveService extends CardService implements Prover {
 
             // g (P1 == 0x02)
             byte[] g = BigIntegerToUnsignedByteArray(subgroup.getG());
-            ICommandAPDU command_g = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command_g = new CommandAPDU(CLA_UPROVE, 
                     INS_SET_GROUP, P1_GROUP_G, 0x00, fixLength(g));
-            IResponseAPDU response_g = transmit(command_g);
+            ResponseAPDU response_g = transmit(command_g);
             if (response_g.getSW() != 0x00009000) {
                 if (response_g.getSW() == 0x00006D00) {
                     notSupported("Could not set generator g.");
@@ -723,9 +722,9 @@ public class UProveService extends CardService implements Prover {
     PrimeOrderGroup getGroup() 
     throws CardServiceException {
         // p (P1 == 0x00)
-        ICommandAPDU command_p = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command_p = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_GROUP, P1_GROUP_P, 0x00);
-        IResponseAPDU response_p = transmit(command_p);
+        ResponseAPDU response_p = transmit(command_p);
         if (response_p.getSW() != 0x00009000) {
             if (response_p.getSW() == 0x00006D00) {
                 notSupported("Could not get group prime p.");
@@ -737,9 +736,9 @@ public class UProveService extends CardService implements Prover {
         }
 
         // q (P1 == 0x01)
-        ICommandAPDU command_q = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command_q = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_GROUP, P1_GROUP_Q, 0x00);
-        IResponseAPDU response_q = transmit(command_q);
+        ResponseAPDU response_q = transmit(command_q);
         if (response_q.getSW() != 0x00009000) {
             if (response_q.getSW() == 0x00006D00) {
                 notSupported("Could not get group order q.");
@@ -751,9 +750,9 @@ public class UProveService extends CardService implements Prover {
         }
 
         // g (P1 == 0x02)
-        ICommandAPDU command_g = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command_g = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_GROUP, P1_GROUP_G, 0x00);
-        IResponseAPDU response_g = transmit(command_g);
+        ResponseAPDU response_g = transmit(command_g);
         if (response_g.getSW() != 0x00009000) {
             if (response_g.getSW() == 0x00006D00) {
                 notSupported("Could not get generator g.");
@@ -780,9 +779,9 @@ public class UProveService extends CardService implements Prover {
      */
     void setHashAlgorithmUID(String hashUID) 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_SET_HASH_ALGORITHM_UID, 0x00, 0x00, hashUID.getBytes());
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not set hash algorithm UID.");
@@ -805,9 +804,9 @@ public class UProveService extends CardService implements Prover {
      */
     String getHashAlgorithmUID() 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_HASH_ALGORITHM_UID, 0x00, 0x00);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not get hash algorithm UID.");
@@ -834,10 +833,10 @@ public class UProveService extends CardService implements Prover {
     void setPublicKey(byte[][] pubKey) 
     throws CardServiceException {
         for (int i = 0; i < pubKey.length; i++) {
-            ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                     INS_SET_PUBLIC_KEY_ELEMENTS, i, pubKey.length, 
                     fixLength(pubKey[i]));
-            IResponseAPDU response = transmit(command);
+            ResponseAPDU response = transmit(command);
             if (response.getSW() != 0x00009000) {
                 if (response.getSW() == 0x00006D00) {
                     notSupported("Could not set public key elements.");
@@ -864,9 +863,9 @@ public class UProveService extends CardService implements Prover {
         byte[][] pubKey = new byte[getNumberOfAttributes() + 2][];
 
         for (int i = 0; i < pubKey.length; i++) {
-            ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                     INS_GET_PUBLIC_KEY_ELEMENTS, i, pubKey.length);
-            IResponseAPDU response = transmit(command);
+            ResponseAPDU response = transmit(command);
             if (response.getSW() != 0x00009000) {
                 if (response.getSW() == 0x00006D00) {
                     notSupported("Could not get public key elements.");
@@ -895,9 +894,9 @@ public class UProveService extends CardService implements Prover {
      */
     void setEncodingBytes(byte[] encodingBytes) 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_SET_ENCODING_BYTES, 0x00, 0x00, encodingBytes);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not set encoding bytes.");
@@ -921,9 +920,9 @@ public class UProveService extends CardService implements Prover {
      */
     byte[] getEncodingBytes() 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_ENCODING_BYTES, 0x00, 0x00);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not get encoding bytes.");
@@ -950,10 +949,10 @@ public class UProveService extends CardService implements Prover {
     void setProverIssuanceValues(byte[][] values) 
     throws CardServiceException {
         for (int i = 0; i < values.length; i++) {
-            ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                     INS_SET_ISSUANCE_VALUES, i, values.length, 
                     fixLength(values[i]));
-            IResponseAPDU response = transmit(command);
+            ResponseAPDU response = transmit(command);
             if (response.getSW() != 0x00009000) {
                 if (response.getSW() == 0x00006D00) {
                     notSupported("Could not set prover issuance values.");
@@ -981,9 +980,9 @@ public class UProveService extends CardService implements Prover {
         byte[][] values = new byte[getNumberOfAttributes() + 2][]; 
 
         for (int i = 0; i < values.length; i++) {
-            ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                     INS_GET_ISSUANCE_VALUES, i, values.length);
-            IResponseAPDU response = transmit(command);
+            ResponseAPDU response = transmit(command);
             if (response.getSW() != 0x00009000) {
                 if (response.getSW() == 0x00006D00) {
                     notSupported("Could not get prover issuance values.");
@@ -1012,9 +1011,9 @@ public class UProveService extends CardService implements Prover {
      */
     void setSpecification(byte[] specification) 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_SET_SPECIFICATION, 0x00, 0x00, specification);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not set specification.");
@@ -1037,9 +1036,9 @@ public class UProveService extends CardService implements Prover {
      */
     byte[] getSpecification() 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_SPECIFICATION, 0x00, 0x00);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not get specification.");
@@ -1066,10 +1065,10 @@ public class UProveService extends CardService implements Prover {
     void setAttributes(byte[][] attributes) 
     throws CardServiceException {
         for (int i = 0; i < attributes.length; i++) {
-            ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                     INS_SET_ATTRIBUTES, i + 1, attributes.length, 
                     attributes[i]);
-            IResponseAPDU response = transmit(command);
+            ResponseAPDU response = transmit(command);
             if (response.getSW() != 0x00009000) {
                 if (response.getSW() == 0x00006D00) {
                     notSupported("Could not set token attributes.");
@@ -1090,9 +1089,9 @@ public class UProveService extends CardService implements Prover {
      */
     public int getNumberOfAttributes() 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_NUMBER_OF_ATTRIBUTES, 0x00, 0x00);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             throw new CardServiceException("Could not get number of " +
                     "attributes.", response.getSW());
@@ -1116,9 +1115,9 @@ public class UProveService extends CardService implements Prover {
         byte[][] attributes = new byte[getNumberOfAttributes()][]; 
 
         for (int i = 0; i < attributes.length; i++) {
-            ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                     INS_GET_ATTRIBUTES, i + 1, attributes.length);
-            IResponseAPDU response = transmit(command);
+            ResponseAPDU response = transmit(command);
             if (response.getSW() != 0x00009000) {
                 if (response.getSW() == 0x00006D00) {
                     notSupported("Could not get token attributes.");
@@ -1148,10 +1147,10 @@ public class UProveService extends CardService implements Prover {
     void setAttributeValues(byte[][] attributeValues) 
     throws CardServiceException {
         for (int i = 0; i < attributeValues.length; i++) {
-            ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                     INS_SET_ATTRIBUTE_VALUES, i + 1, attributeValues.length, 
                     fixLength(attributeValues[i]));
-            IResponseAPDU response = transmit(command);
+            ResponseAPDU response = transmit(command);
             if (response.getSW() != 0x00009000) {
                 if (response.getSW() == 0x00006D00) {
                     notSupported("Could not set token attribute values.");
@@ -1179,9 +1178,9 @@ public class UProveService extends CardService implements Prover {
         byte[][] values = new byte[getNumberOfAttributes()][]; 
 
         for (int i = 0; i < values.length; i++) {
-            ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                     INS_GET_ATTRIBUTE_VALUES, i + 1, values.length);
-            IResponseAPDU response = transmit(command);
+            ResponseAPDU response = transmit(command);
             if (response.getSW() != 0x00009000) {
                 if (response.getSW() == 0x00006D00) {
                     notSupported("Could not get token attribute values.");
@@ -1210,9 +1209,9 @@ public class UProveService extends CardService implements Prover {
      */
     void setTokenInformation(byte[] tokenInformation) 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_SET_TOKEN_INFORMATION, 0x00, 0x00, tokenInformation);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not set token information.");
@@ -1235,9 +1234,9 @@ public class UProveService extends CardService implements Prover {
      */
     byte[] getTokenInformation() 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_TOKEN_INFORMATION, 0x00, 0x00);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not set token information.");
@@ -1263,9 +1262,9 @@ public class UProveService extends CardService implements Prover {
      */
     void setProverInformation(byte[] proverInformation) 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_SET_PROVER_INFORMATION, 0x00, 0x00, proverInformation);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not set prover information.");
@@ -1288,9 +1287,9 @@ public class UProveService extends CardService implements Prover {
      */
     byte[] getProverInformation() 
     throws CardServiceException {
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_PROVER_INFORMATION, 0x00, 0x00);
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             if (response.getSW() == 0x00006D00) {
                 notSupported("Could not set prover information.");
@@ -1334,9 +1333,9 @@ public class UProveService extends CardService implements Prover {
     public void precomputation() 
     throws IOException {
         try {
-            ICommandAPDU command_inputs = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command_inputs = new CommandAPDU(CLA_UPROVE, 
                     INS_PRECOMPUTE_INPUTS, 0x00, 0x00);
-            IResponseAPDU response_inputs = transmit(command_inputs);
+            ResponseAPDU response_inputs = transmit(command_inputs);
             if (response_inputs.getSW() != 0x00009000) {
                 if (response_inputs.getSW() == 0x00006D00) {
                     notSupported("Could not perform precomputation.");
@@ -1344,9 +1343,9 @@ public class UProveService extends CardService implements Prover {
                     throw new IOException("Could not perform precomputation.");
                 }
             }       
-            ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                     INS_PRECOMPUTE, 0x00, 0x00);
-            IResponseAPDU response = transmit(command);
+            ResponseAPDU response = transmit(command);
             if (response.getSW() != 0x00009000) {
                 if (response.getSW() == 0x00006D00) {
                     notSupported("Could not perform precomputation.");
@@ -1382,17 +1381,17 @@ public class UProveService extends CardService implements Prover {
 
         try {
             // send sigmaA
-            ICommandAPDU commit_a = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU commit_a = new CommandAPDU(CLA_UPROVE, 
                     INS_COMMIT_SIGMA_A, 0x00, 0x00, fixLength(message1[0]));
-            IResponseAPDU response_a = transmit(commit_a);
+            ResponseAPDU response_a = transmit(commit_a);
             if (response_a.getSW() != 0x00009000) {
                 throw new IOException("Could not commit sigmaA.");
             }	    
 
             // send sigmaB and receive sigmaC
-            ICommandAPDU commit_b = new CommandAPDU(CLA_UPROVE, 
+            CommandAPDU commit_b = new CommandAPDU(CLA_UPROVE, 
                     INS_COMMIT_SIGMA_B, 0x00, 0x00, fixLength(message1[1]));
-            IResponseAPDU response_b = transmit(commit_b);
+            ResponseAPDU response_b = transmit(commit_b);
             if (response_b.getSW() != 0x00009000) {
                 throw new IOException("Could not commit sigmaB.");
             }
@@ -1461,10 +1460,10 @@ public class UProveService extends CardService implements Prover {
     public UProveKeyAndToken[] generateTokens(byte[][] message3, boolean verify) 
     throws CardServiceException {
         // send sigmaR
-        ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                 INS_SIGNATURE_SIGMA_R, verify ? 0x01 : 0x00, 0x00, 
                         fixLength(message3[0]));
-        IResponseAPDU response = transmit(command);
+        ResponseAPDU response = transmit(command);
         if (response.getSW() != 0x00009000) {
             throw new CardServiceException("Could not issue signature sigmaR.", 
                     response.getSW());
@@ -1489,36 +1488,36 @@ public class UProveService extends CardService implements Prover {
         token.setTokenInformation(getTokenInformation());
         token.setProverInformation(getProverInformation());
 
-        ICommandAPDU command_h = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command_h = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_TOKEN, P1_TOKEN_H, 4);
-        IResponseAPDU response_h = transmit(command_h);
+        ResponseAPDU response_h = transmit(command_h);
         if (response_h.getSW() != 0x00009000) {
             throw new CardServiceException("Could not get token public key.", 
                     response_h.getSW());
         }
         token.setPublicKey(response_h.getData());
 
-        ICommandAPDU command_z = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command_z = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_TOKEN, P1_TOKEN_SIGMA_Z, 4);
-        IResponseAPDU response_z = transmit(command_z);
+        ResponseAPDU response_z = transmit(command_z);
         if (response_z.getSW() != 0x00009000) {
             throw new CardServiceException("Could not get token signature " +
                     "(sigma_z').", response_z.getSW());
         }
         token.setSigmaZ(response_z.getData());
 
-        ICommandAPDU command_c = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command_c = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_TOKEN, P1_TOKEN_SIGMA_C, 4);
-        IResponseAPDU response_c = transmit(command_c);
+        ResponseAPDU response_c = transmit(command_c);
         if (response_c.getSW() != 0x00009000) {
             throw new CardServiceException("Could not get token signature " +
                     "(sigma_c').", response_c.getSW());
         }
         token.setSigmaC(response_c.getData());
 
-        ICommandAPDU command_r = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command_r = new CommandAPDU(CLA_UPROVE, 
                 INS_GET_TOKEN, P1_TOKEN_SIGMA_R, 4);
-        IResponseAPDU response_r = transmit(command_r);
+        ResponseAPDU response_r = transmit(command_r);
         if (response_r.getSW() != 0x00009000) {
             throw new CardServiceException("Could not get token signature " +
                     "(sigma_r').", response_r.getSW());
@@ -1555,18 +1554,18 @@ public class UProveService extends CardService implements Prover {
         }
 
         // send the attribute disclosure selection
-        ICommandAPDU command_d = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command_d = new CommandAPDU(CLA_UPROVE, 
                 INS_ATTRIBUTE_DISCLOSURE, 0x00, 0x00, D);
-        IResponseAPDU response_d = transmit(command_d);
+        ResponseAPDU response_d = transmit(command_d);
         if (response_d.getSW() != 0x00009000) {
             throw new CardServiceException("Could not set attribute " +
                     "disclosure selection.", response_d.getSW());
         }
 
         // send the challenge
-        ICommandAPDU command_m = new CommandAPDU(CLA_UPROVE, 
+        CommandAPDU command_m = new CommandAPDU(CLA_UPROVE, 
                 INS_CHALLENGE, 0x00, 0x00, m);
-        IResponseAPDU response_a = transmit(command_m);
+        ResponseAPDU response_a = transmit(command_m);
         if (response_a.getSW() != 0x00009000) {
             throw new CardServiceException("Could not set the challenge.", 
                     response_a.getSW());
@@ -1582,18 +1581,18 @@ public class UProveService extends CardService implements Prover {
         byte[][] disclosedAttributes = new byte[disclosed.length][];
         for (int i = 0; i <= length; i++) {
             if (j < disclosed.length && disclosed[j] == i) {
-                ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+                CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                         INS_DISCLOSED_ATTRIBUTES, i, length);
-                IResponseAPDU response = transmit(command);
+                ResponseAPDU response = transmit(command);
                 if (response.getSW() != 0x00009000) {
                     throw new CardServiceException("Could not get disclosed " +
                             "attribute (@index " + i + ").", response.getSW());
                 }
                 disclosedAttributes[j++] = response.getData();
             } else {
-                ICommandAPDU command = new CommandAPDU(CLA_UPROVE, 
+                CommandAPDU command = new CommandAPDU(CLA_UPROVE, 
                         INS_UNDISCLOSED_ATTRIBUTES, i, length + 1);
-                IResponseAPDU response = transmit(command);
+                ResponseAPDU response = transmit(command);
                 if (response.getSW() != 0x00009000) {
                     throw new CardServiceException("Could not get random " +
                             "value (@index " + i + ").", response.getSW());
