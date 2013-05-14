@@ -3,8 +3,7 @@ package service;
 
 import net.sourceforge.scuba.smartcards.CardService;
 import net.sourceforge.scuba.smartcards.CardServiceException;
-import net.sourceforge.scuba.smartcards.ICommandAPDU;
-import net.sourceforge.scuba.smartcards.IResponseAPDU;
+import net.sourceforge.scuba.smartcards.CommandAPDU;
 import net.sourceforge.scuba.smartcards.ResponseAPDU;
 
 public class EchoCardService extends CardService {
@@ -19,7 +18,7 @@ public class EchoCardService extends CardService {
         return true;
     }
 
-    public IResponseAPDU transmit(ICommandAPDU apdu) throws CardServiceException {
+    public ResponseAPDU transmit(CommandAPDU apdu) throws CardServiceException {
         System.out.println("transmit(CommandAPDU) called");
         System.out.println(Hex.bytesToHexString(apdu.getBytes()));
         return new ResponseAPDU(new byte[]{(byte) 0x90, 0x00});
